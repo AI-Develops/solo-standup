@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoloStandup | Daily Update Drafter</title>
+    <style>
+        /* --- CSS Reset & Variables --- */
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-400: #94a3b8;
+            --slate-600: #475569;
+            --slate-800: #1e293b;
+            --slate-900: #0f172a;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #ef4444;
+            --radius: 8px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 
+                      0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+                         Helvetica, Arial, sans-serif;
+            background-color: var(--slate-50);
+            color: var(--slate-900);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        /* --- Layout --- */
+        .container {
+            width: 100%;
+            max-width: 640px;
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--slate-200);
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        p.subtitle {
+            color: var(--slate-600);
+            font-size: 0.95rem;
+        }
+
+        /* --- Form Elements --- */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--slate-800);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            font-size: 1rem;
+            color: var(--slate-800);
+            background-color: var(--slate-50);
+            border: 1px solid var(--slate-300);
+            border-radius: var(--radius);
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background-color: white;
+        }
+
+        textarea::placeholder {
+            color: var(--slate-400);
+        }
+
+        /* --- Actions --- */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--slate-200);
+        }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--slate-600);
+            border: 1px solid var(--slate-300);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--slate-50);
+            color: var(--danger);
+            border-color: var(--slate-300);
+        }
+
+        /* --- Utilities & SVGs --- */
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--slate-900);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        #toast.show {
+            opacity: 1;
+        }
+
+        /* --- Mobile --- */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+                border: none;
+                box-shadow: none;
+            }
+            body {
+                padding: 0;
+                background-color: white;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                     viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                     class="icon">
+                  <path stroke-linecap="round" stroke-linejoin="round" 
+                        d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3" />
+                </svg>
+                SoloStandup
+            </h1>
+            <p class="subtitle">Draft, persist, and copy your daily agile updates.</p>
+        </header>
+
+        <main>
+            <div class="input-group">
+                <label for="yesterday">✅ Yesterday</label>
+                <textarea id="yesterday" 
+                          placeholder="What did you achieve yesterday?"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="today">🚧 Today</label>
+                <textarea id="today" 
+                          placeholder="What is your focus for today?"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label for="blockers">🚫 Blockers</label>
+                <textarea id="blockers" 
+                          placeholder="Any impediments? (Optional)"></textarea>
+            </div>
+
+            <div class="actions">
+                <button class="btn-secondary" id="clearBtn" title="Clear All">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" 
+                         stroke="currentColor" class="icon">
+                      <path stroke-linecap="round" stroke-linejoin="round" 
+                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                    Clear
+                </button>
+                <button class="btn-primary" id="copyBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" 
+                         viewBox="0 0 24 24" stroke-width="1.5" 
+                         stroke="currentColor" class="icon">
+                      <path stroke-linecap="round" stroke-linejoin="round" 
+                            d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" />
+                    </svg>
+                    Copy to Clipboard
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast">Copied to clipboard!</div>
+
+    <script>
+        // Selectors
+        const inputs = {
+            yesterday: document.getElementById('yesterday'),
+            today: document.getElementById('today'),
+            blockers: document.getElementById('blockers')
+        };
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const toast = document.getElementById('toast');
+
+        // Load data from LocalStorage on init
+        function loadData() {
+            for (const [key, element] of Object.entries(inputs)) {
+                const saved = localStorage.getItem(`solo_${key}`);
+                if (saved) element.value = saved;
+            }
+        }
+
+        // Save data to LocalStorage on input
+        function setupAutoSave() {
+            for (const [key, element] of Object.entries(inputs)) {
+                element.addEventListener('input', () => {
+                    localStorage.setItem(`solo_${key}`, element.value);
+                });
+            }
+        }
+
+        // Format and Copy
+        function copyToClipboard() {
+            const y = inputs.yesterday.value.trim() || "Nothing recorded";
+            const t = inputs.today.value.trim() || "Working on tickets";
+            const b = inputs.blockers.value.trim() || "None";
+
+            // Format suitable for Slack/Teams (Markdown)
+            const text = `*Yesterday:*\n${y}\n\n*Today:*\n${t}\n\n*Blockers:*\n${b}`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert("Failed to copy text.");
+            });
+        }
+
+        // Clear functionality
+        function clearAll() {
+            if(confirm("Are you sure you want to clear your update?")) {
+                for (const [key, element] of Object.entries(inputs)) {
+                    element.value = '';
+                    localStorage.removeItem(`solo_${key}`);
+                }
+            }
+        }
+
+        // UI Feedback
+        function showToast() {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setupAutoSave();
+            copyBtn.addEventListener('click', copyToClipboard);
+            clearBtn.addEventListener('click', clearAll);
+        });
+    </script>
+</body>
+</html>
